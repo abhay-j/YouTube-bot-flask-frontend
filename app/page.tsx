@@ -1,101 +1,121 @@
-import Image from "next/image";
+'use client'
+import React, { useState } from "react";
+import axios from 'axios'
+
+// define a type for your video data 
+type video = {
+  id: string;
+  published_at: string;
+  score: number;
+  title: string;
+  url: string
+}
+
+
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [searchQuery, setSearchQuery] = useState('');
+  const [videos, setVideos] = useState<video[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<String | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setError(null);
+
+    if (!searchQuery.trim()) {
+      setValidationError('Please enter a search term');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/", {
+        query: searchQuery.trim()
+      });
+      setVideos(response.data);
+    }
+    catch (err) {
+      setError("Failed to fetch videos please try again");
+      console.log("Search Error", err);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
+
+
+
+  return (<main className="min-h-screen p-8">
+    <h1 className="text-2xl font-bold mb-8 ">Search on Overpowered</h1>
+
+    {/* Search Form */}
+    <form onSubmit={handleSearch} className="mb-8 flex gap-2">
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => {
+          setSearchQuery(e.target.value);
+          if (validationError) setValidationError(null);
+        }}
+        placeholder="Search videos..."
+        className="flex-grow p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500"
+      />
+      <button
+        type="submit"
+        className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center"
+        disabled={isLoading}
+      >
+        {isLoading ? 'Searching...' : 'Search'}
+      </button>
+
+
+    </form>
+
+    {/* Show validation error */}
+    {validationError && (
+      <p className="text-red-500 text-sm">{validationError}</p>
+    )}
+
+    {/* Show initial prompt below the search bar */}
+    {!searchQuery && (
+      <p className="text-gray-500 text-center">Search through all videos from Overpowered.AI to get relevant information</p>
+    )}
+    {/* Loading State */}
+    {isLoading && (
+      <div className="text-center">Loading...</div>
+    )}
+
+    {/* Error State */}
+    {error && (
+      <div className="text-red-500 mb-4">{error}</div>
+    )}
+
+    {/* Results */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {videos.map((video) => (
+        <div
+          key={video.id}
+          className="border rounded-lg p-4 hover:shadow-lg transition-shadow"
+        >
+          <h2 className="font-semibold mb-2">{video.title}</h2>
+          <p className="text-sm text-gray-600">
+            Published: {new Date(video.published_at).toLocaleDateString()}
+          </p>
           <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href={video.url}
             target="_blank"
             rel="noopener noreferrer"
+            className="text-blue-500 hover:underline mt-2 block"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
+            Watch Video
           </a>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      ))}
     </div>
+  </main>
   );
 }
