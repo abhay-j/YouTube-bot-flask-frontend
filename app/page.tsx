@@ -33,7 +33,7 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/", {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}`, {
         query: searchQuery.trim()
       });
       setVideos(response.data);
