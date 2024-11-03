@@ -17,7 +17,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [videos, setVideos] = useState<video[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<String | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
