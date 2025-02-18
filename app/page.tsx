@@ -382,7 +382,7 @@ export default function Home() {
     setDisplayText('');
     
     try {
-      const result = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL}`, {
+      const result = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}`, {
         query: searchQuery.trim()
       });
       setResponse(result.data);
