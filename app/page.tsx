@@ -453,7 +453,7 @@ export default function Home() {
       
       {/* Show initial prompt below the search bar */}
       {!searchQuery && !response && (
-        <p className="text-gray-500 text-center">Search through all videos from Overpowered.AI to get relevant information</p>
+        <p className="text-gray-500 text-center">Search through all videos from Overpowered.AI to get relevant information (Currently under developement, please use these queries to test : "Tell me about Midjourney", "Text to image tools", "Tell me about Suno AI") </p>
       )}
       
       {/* Loading State */}
